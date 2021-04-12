@@ -1,4 +1,4 @@
-sealed interface Expr {
+interface Expr {
   fun evaluate(env: Env): Any
 }
 
@@ -12,7 +12,8 @@ inline class ProcedureCall(private val list: MutableList<Expr> = mutableListOf()
   }
 
   override fun evaluate(env: Env): Any {
-    val op = env[list[0].evaluate(env)] as Procedure
+    val symbol = list[0] as Symbol
+    val op = env[symbol.name] as Procedure
     return op(list.subList(1, list.size).map { it.evaluate(env) })
   }
 }
@@ -28,13 +29,27 @@ inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) 
   }
 }
 
-sealed interface Atom : Expr
-inline class Symbol(val value: String) : Atom {
-  override fun evaluate(env: Env): Any = value
-  override fun toString(): String = value
+
+inline class Definition(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
+  override fun plusAssign(item: Expr) {
+    list += item
+  }
+
+  override fun evaluate(env: Env): Any {
+    val symbol = list[1] as Symbol
+    val result = list[2].evaluate(env)
+    env[symbol.name] = result
+    return result
+  }
 }
 
-sealed interface NumberAtom : Atom
+interface Atom : Expr
+inline class Symbol(val name: String) : Atom {
+  override fun evaluate(env: Env): Any = env[name] ?: error("cannot find Symbol[${name}]")
+  override fun toString(): String = name
+}
+
+interface NumberAtom : Atom
 inline class IntNumber(val value: Int) : NumberAtom {
   override fun evaluate(env: Env): Any = value
 }
@@ -62,6 +77,7 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
     "(" -> {
       val list = when (tokens.peek()) {
         "if" -> Conditional()
+        "define" -> Definition()
         else -> ProcedureCall()
       }
       while (tokens.hasNext() && tokens.peek() != ")") list += readFromTokens(tokens)
@@ -76,6 +92,5 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
 fun read(string: String): Expr = readFromTokens(tokenize(string).iterator())
 
 fun main() {
-  val tokens = tokenize("(+ 1 1)")
-  println(tokens)
+  read("(+ 1 1)").evaluate(DefaultEnv()).also { println(it) }
 }
