@@ -17,10 +17,11 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
       val list = when (tokens.peek()) {
         "if" -> Conditional()
         "define" -> Definition()
+        "lambda" -> ProcedureDefinition().apply {}
         else -> ProcedureCall()
       }
       while (tokens.hasNext() && tokens.peek() != ")") list += readFromTokens(tokens)
-      tokens.next()
+      tokens.next() // consume ")"
       list
     }
     ")" -> error("unexpected )")
@@ -30,7 +31,7 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
 
 fun read(string: String): Expr = readFromTokens(tokenize(string).iterator())
 
-fun Env.run(string: String) = string
+fun Env.eval(string: String) = string
   .split("\\n".toRegex())
   .filterNot { it.isBlank() }
   .map { read(it).evaluate(this) }

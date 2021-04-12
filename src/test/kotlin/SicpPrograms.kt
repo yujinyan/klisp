@@ -1,27 +1,22 @@
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 
 class SicpPrograms : StringSpec({
-  "1.1.2" {
-    val env = DefaultEnv()
-    """
+  "1.1.2 Naming and the Environment" {
+    with(DefaultEnv()) {
+      """
       (define pi 3.14159)
       (define radius 10)
       (* pi (* radius radius))
-    """
-      .split("\\n".toRegex())
-      .filterNot { it.isBlank() }
-      .map { read(it).evaluate(env) }
-      .last() shouldBe 314.159f
+    """.let { eval(it) }.last() shouldBe 314.159f
+    }
   }
   "1.1.4 Compound Procedures" {
-    val env = DefaultEnv()
-    """
-      (define (square x) (* x x))
+    with(DefaultEnv()) {
+      """
+      (define square (lambda (x) (* x x)))
       (square 5)
-    """
-      .let { with(env) { run(it) } }
-      .last() shouldBe 25
+    """.let { eval(it) }.last() shouldBe 25
+    }
   }
 })

@@ -6,7 +6,7 @@ interface ExprList : Expr {
   operator fun plusAssign(item: Expr)
 }
 
-inline class ProcedureCall(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
+inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ExprList {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -20,10 +20,20 @@ inline class ProcedureCall(private val list: MutableList<Expr> = mutableListOf()
 
 inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
   override fun evaluate(env: Env): Any {
+    val params = (list[1] as ProcedureCall).list
+    val body = (list[2] as ProcedureCall)
 
     return object : Procedure {
       override fun invoke(args: List<Any>): Any {
-        TODO("Not yet implemented")
+        env.push()
+
+        params.forEachIndexed { index, expr ->
+          env[(expr as Symbol).name] = args[index]
+        }
+
+        val result = body.evaluate(env)
+        env.pop()
+        return result
       }
     }
   }
