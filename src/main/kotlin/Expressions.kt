@@ -21,7 +21,7 @@ inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : Expr
 inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
   override fun evaluate(env: Env): Any {
     val params = (list[1] as ProcedureCall).list
-    val body = (list[2] as ProcedureCall)
+    val body = list[2]
 
     return object : Procedure {
       override fun invoke(args: List<Any>): Any {
@@ -49,8 +49,10 @@ inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) 
   }
 
   override fun evaluate(env: Env): Any {
-    val test = list[0].evaluate(env) as? Boolean ?: error("Cannot evaluate")
-    return if (test) list[1].evaluate(env) else list[2].evaluate(env)
+    val test = list[1].evaluate(env) as? Boolean ?: error("Cannot evaluate")
+    return if (test)
+      list[2].evaluate(env)
+    else list[3].evaluate(env)
   }
 }
 

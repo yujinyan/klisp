@@ -12,6 +12,8 @@ class EvaluateTests : StringSpec({
   }
 
   "conditional" {
+    read("(if (< 1 2) 1 0)").evaluate(env) shouldBe 1
+    read("(if (< 2 1) 1 0)").evaluate(env) shouldBe 0
   }
 
   "definition" {
@@ -20,6 +22,10 @@ class EvaluateTests : StringSpec({
 
   "subtract" {
     read("(- 6 3 2 1)").evaluate(env) shouldBe 0
+  }
+
+  "negative" {
+    read("(- 1)").evaluate(env) shouldBe -1
   }
 
   "complicated arithmetic" {
