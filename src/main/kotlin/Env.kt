@@ -1,6 +1,37 @@
+typealias Frame = MutableMap<String, Any>
+
 class Env(
-  private val map: MutableMap<String, Any> = mutableMapOf()
-) : MutableMap<String, Any> by map
+  private val frames: ArrayDeque<Frame> = ArrayDeque()
+) {
+  init {
+    push()
+  }
+
+  private val stack = frames.asReversed()
+  private val current get() = stack.first()
+
+  operator fun get(key: String): Any? {
+    for (data in stack) {
+      val item = data[key]
+      if (item != null) return item
+    }
+    return null
+  }
+
+  operator fun set(key: String, value: Any) {
+    current[key] = value
+  }
+
+  fun put(key: String, value: Any) = set(key, value)
+
+  fun push() {
+    frames.addLast(hashMapOf())
+  }
+
+  fun pop() {
+    frames.removeLast()
+  }
+}
 
 @Suppress("FunctionName")
 fun DefaultEnv() = Env().apply {
