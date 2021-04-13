@@ -12,7 +12,7 @@ class PeekableIterator<T>(
     return peeked
   }
 
-  override fun hasNext(): Boolean = iterator.hasNext()
+  override fun hasNext(): Boolean = if (peeked != null) true else iterator.hasNext()
 
   override fun next(): T = peeked?.let<T, T> {
     peeked = null

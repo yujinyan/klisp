@@ -13,4 +13,16 @@ class PeekableTests : StringSpec({
     iter.peek() shouldBe 3
     iter.next() shouldBe 3
   }
+
+  "one element iterator" {
+    val iter = listOf(1).iterator().peekable()
+
+    iter.peek() shouldBe 1
+    iter.peek() shouldBe 1
+    iter.hasNext() shouldBe true
+    iter.peek() shouldBe 1
+    iter.next() shouldBe 1
+
+    iter.hasNext() shouldBe false
+  }
 })
