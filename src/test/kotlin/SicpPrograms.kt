@@ -1,10 +1,12 @@
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.floats.plusOrMinus
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 
 class SicpPrograms : StringSpec({
   fun String.eval(): Any {
-    val string = this
-    return with(DefaultEnv()) { eval(string) }.last()
+    val env = DefaultEnv()
+    return buildAstList(this).map { it.evaluate(env) }.last()
   }
 
   "1.1.2 Naming and the Environment" {
@@ -45,6 +47,6 @@ class SicpPrograms : StringSpec({
       (define abs (lambda (x) (if (< x 0) (- x) x)))
       (define sqrt (lambda (x) (sqrt-iter 1.0 x)))
       (sqrt 25)
-    """.eval().also { println(it) }
+    """.eval() as Float shouldBe 5f.plusOrMinus(0.001f)
   }
 })

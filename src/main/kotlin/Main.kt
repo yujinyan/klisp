@@ -1,16 +1,18 @@
 fun tokenize(string: String): List<String> {
-  val splits = string.replace("(", " ( ")
+  val splits = string
+    .replace("\\n+".toRegex(), "")
+    .replace("(", " ( ")
     .replace(")", " ) ")
     .split("\\s+".toRegex())
 
   return splits.subList(1, splits.lastIndex)
 }
 
-fun String.toAtom(): Atom = toIntOrNull()?.let { IntNumber(it) }
+private fun String.toAtom(): Atom = toIntOrNull()?.let { IntNumber(it) }
   ?: toFloatOrNull()?.let { FloatNumber(it) }
   ?: Symbol(this)
 
-fun readFromTokens(tokens: Iterator<String>): Expr {
+fun buildAst(tokens: Iterator<String>): Expr {
   val tokens = tokens.peekable()
   return when (val item = tokens.next()) {
     "(" -> {
@@ -20,7 +22,7 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
         "lambda" -> ProcedureDefinition().apply {}
         else -> ProcedureCall()
       }
-      while (tokens.hasNext() && tokens.peek() != ")") list += readFromTokens(tokens)
+      while (tokens.hasNext() && tokens.peek() != ")") list += buildAst(tokens)
       tokens.next() // consume ")"
       list
     }
@@ -29,13 +31,16 @@ fun readFromTokens(tokens: Iterator<String>): Expr {
   }
 }
 
-fun read(string: String): Expr = readFromTokens(tokenize(string).iterator())
+fun buildAst(string: String): Expr = buildAst(tokenize(string).iterator())
 
-fun Env.eval(string: String) = string
-  .split("\\n".toRegex())
-  .filterNot { it.isBlank() }
-  .map { read(it).evaluate(this) }
+@OptIn(ExperimentalStdlibApi::class)
+fun buildAstList(string: String): List<Expr> = buildList {
+  tokenize(string).iterator().let {
+    while (it.hasNext()) add(buildAst(it))
+  }
+}
+
 
 fun main() {
-  read("(+ 1 1)").evaluate(DefaultEnv()).also { println(it) }
+  buildAst("(+ 1 1)").evaluate(DefaultEnv()).also { println(it) }
 }

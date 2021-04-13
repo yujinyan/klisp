@@ -5,37 +5,37 @@ val env = DefaultEnv()
 
 class EvaluateTests : StringSpec({
   "1 + 1" {
-    read("(+ 1 1)").evaluate(env) shouldBe 2
+    buildAst("(+ 1 1)").evaluate(env) shouldBe 2
   }
   "nested" {
-    read("(+ 1 (+ 2 3))").evaluate(env) shouldBe 6
+    buildAst("(+ 1 (+ 2 3))").evaluate(env) shouldBe 6
   }
 
   "conditional" {
-    read("(if (< 1 2) 1 0)").evaluate(env) shouldBe 1
-    read("(if (< 2 1) 1 0)").evaluate(env) shouldBe 0
+    buildAst("(if (< 1 2) 1 0)").evaluate(env) shouldBe 1
+    buildAst("(if (< 2 1) 1 0)").evaluate(env) shouldBe 0
   }
 
   "definition" {
-    read("(define a 1)").evaluate(env) shouldBe 1
+    buildAst("(define a 1)").evaluate(env) shouldBe 1
   }
 
   "subtract" {
-    read("(- 6 3 2 1)").evaluate(env) shouldBe 0
+    buildAst("(- 6 3 2 1)").evaluate(env) shouldBe 0
   }
 
   "negative" {
-    read("(- 1)").evaluate(env) shouldBe -1
+    buildAst("(- 1)").evaluate(env) shouldBe -1
   }
 
   "complicated arithmetic" {
     arrayListOf(1, 2,3 )
-    read("(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6 ))")
+    buildAst("(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6 ))")
       .evaluate(env) shouldBe 57
   }
 
   "pretty format" {
-    read(
+    buildAst(
       """
       (* (+ 2 (* 4 6))
          (+ 3 5 7))
@@ -44,8 +44,8 @@ class EvaluateTests : StringSpec({
   }
 
   "multiple expr" {
-    read("(define x 1)").evaluate(env) shouldBe 1
-    read("(+ x 1)").evaluate(env) shouldBe 2
+    buildAst("(define x 1)").evaluate(env) shouldBe 1
+    buildAst("(+ x 1)").evaluate(env) shouldBe 2
   }
 
   "wrong 1 + 1" {
