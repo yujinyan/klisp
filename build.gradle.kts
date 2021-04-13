@@ -15,7 +15,6 @@ tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     useIR = true
     freeCompilerArgs = listOf("-Xinline-classes")
-    languageVersion = "1.5"
   }
 }
 
