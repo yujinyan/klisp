@@ -8,7 +8,7 @@ fun tokenize(string: String): List<String> {
   return splits.subList(1, splits.lastIndex)
 }
 
-private fun String.toAtom(): Atom = toIntOrNull()?.let { IntNumber(it) }
+fun String.toAtom(): Atom = toIntOrNull()?.let { IntNumber(it) }
   ?: toFloatOrNull()?.let { FloatNumber(it) }
   ?: Symbol(this)
 
@@ -19,7 +19,7 @@ fun buildAst(tokens: Iterator<String>): Expr {
       val list = when (tokens.peek()) {
         "if" -> Conditional()
         "define" -> Definition()
-        "lambda" -> ProcedureDefinition().apply {}
+        "lambda" -> ProcedureDefinition()
         else -> ProcedureCall()
       }
       while (tokens.hasNext() && tokens.peek() != ")") list += buildAst(tokens)

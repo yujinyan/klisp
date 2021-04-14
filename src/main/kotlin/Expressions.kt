@@ -2,11 +2,11 @@ interface Expr {
   fun evaluate(env: Env): Any
 }
 
-interface ExprList : Expr {
+interface ListExpr : Expr {
   operator fun plusAssign(item: Expr)
 }
 
-inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ExprList {
+inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -18,9 +18,9 @@ inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : Expr
   }
 }
 
-inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
+inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun evaluate(env: Env): Any {
-    val params = (list[1] as ProcedureCall).list
+    val params = (list[1] as? ProcedureCall)?.list ?: error("${list[1]} is not a ProcedureCall")
     val body = list[2]
 
     return object : Procedure {
@@ -43,7 +43,7 @@ inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableLi
   }
 }
 
-inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
+inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -57,7 +57,7 @@ inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) 
 }
 
 
-inline class Definition(private val list: MutableList<Expr> = mutableListOf()) : ExprList {
+inline class Definition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }

@@ -1,6 +1,5 @@
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.floats.plusOrMinus
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 
 class SicpPrograms : StringSpec({
@@ -47,6 +46,14 @@ class SicpPrograms : StringSpec({
       (define abs (lambda (x) (if (< x 0) (- x) x)))
       (define sqrt (lambda (x) (sqrt-iter 1.0 x)))
       (sqrt 25)
-    """.eval() as Float shouldBe 5f.plusOrMinus(0.001f)
+    """.eval() shouldBe 5f.plusOrMinus(0.001f)
+  }
+
+  "1.2.1 Linear Recursion" {
+    """
+      (define factorial (lambda (n) 
+        (if (= n 1) 1 (* n (factorial (- n 1))))))
+      (factorial 6)
+    """.eval() shouldBe 720
   }
 })
