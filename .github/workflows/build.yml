@@ -31,10 +31,18 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Build GraalVM Native Image
-        run: ./gradlew nativeImage
+        uses: eskatos/gradle-command-action@v1.3.3
+        with:
+          arguments: nativeImage
+          wrapper-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: true
+          
+      - name: 'Tar files'
+        run: tar -cvf klisp.tar build/graal
 
       # Runs a set of commands using the runners shell
       - uses: actions/upload-artifact@v2
         with:
-          name: Upload Binary
-          path: build/graal/klisp
+          name: klisp
+          path: klisp.tar
