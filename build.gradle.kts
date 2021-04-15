@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("jvm") version "1.4.32"
+  id("com.palantir.graal") version "0.7.2"
 }
 
 group = "me.yujinyan"
@@ -16,6 +17,12 @@ tasks.withType<KotlinCompile>().configureEach {
     useIR = true
     freeCompilerArgs = listOf("-Xinline-classes")
   }
+}
+
+graal {
+  javaVersion("11")
+  mainClass("MainKt")
+  outputName("klisp")
 }
 
 repositories {
