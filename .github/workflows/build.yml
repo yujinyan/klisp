@@ -39,7 +39,7 @@ jobs:
           configuration-cache-enabled: true
           
       - name: 'Tar files'
-        run: tar -cvf klisp.tar build/graal
+        run: tar -cvf klisp.tar build/graal/klisp
 
       # Runs a set of commands using the runners shell
       - uses: actions/upload-artifact@v2
