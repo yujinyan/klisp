@@ -40,7 +40,15 @@ fun buildAstList(string: String): List<Expr> = buildList {
   }
 }
 
-
-fun main() {
-  buildAst("(+ 1 1)").evaluate(DefaultEnv()).also { println(it) }
+fun repl() {
+  val symbol = "λ >> ".also { print(it) }
+  val env = DefaultEnv()
+  while (true) {
+    readLine()
+      ?.let { buildAst(it).evaluate(env) }
+      ?.also { println(it) }
+    print(symbol)
+  }
 }
+
+fun main() = repl()
