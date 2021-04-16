@@ -51,4 +51,4 @@ fun repl() {
   }
 }
 
-fun main() = repl()
+fun main(args: Array<String>) = Cli().main(args)
