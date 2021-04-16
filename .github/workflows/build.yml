@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build
 
 # Controls when the action will run. 
 on:
@@ -37,6 +37,9 @@ jobs:
           wrapper-cache-enabled: true
           dependencies-cache-enabled: true
           configuration-cache-enabled: true
+
+      - name: Test Binary
+        run: build/graal/klisp -e "(+ 1 1)"
 
       # Runs a set of commands using the runners shell
       - uses: actions/upload-artifact@v2

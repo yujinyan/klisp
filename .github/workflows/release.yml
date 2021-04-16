@@ -14,6 +14,13 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Build Fat Jar
+        uses: eskatos/gradle-command-action@v1.3.3
+        with:
+          arguments: shadowJar
+          wrapper-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: true
       - name: Build GraalVM Native Image
         uses: eskatos/gradle-command-action@v1.3.3
         with:
@@ -24,7 +31,9 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/graal/klisp
+          files: |
+            build/graal/klisp
+            build/libs/klisp.jar
           draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
