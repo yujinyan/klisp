@@ -36,6 +36,7 @@ graal {
   javaVersion("11")
   mainClass("MainKt")
   outputName("klisp")
+  option("--no-fallback")
 }
 
 repositories {
