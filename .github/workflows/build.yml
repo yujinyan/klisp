@@ -38,6 +38,9 @@ jobs:
           dependencies-cache-enabled: true
           configuration-cache-enabled: true
 
+      - name: Test Binary
+        run: build/graal/klisp -e "(+ 1 1)"
+
       # Runs a set of commands using the runners shell
       - uses: actions/upload-artifact@v2
         with:
