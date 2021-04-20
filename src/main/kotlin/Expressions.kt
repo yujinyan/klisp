@@ -6,7 +6,8 @@ interface ListExpr : Expr {
   operator fun plusAssign(item: Expr)
 }
 
-inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListExpr {
+@JvmInline
+value class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -18,7 +19,8 @@ inline class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : List
   }
 }
 
-inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
+@JvmInline
+value class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun evaluate(env: Env): Any {
     val params = (list[1] as? ProcedureCall)?.list ?: error("${list[1]} is not a ProcedureCall")
     val body = list[2]
@@ -43,7 +45,8 @@ inline class ProcedureDefinition(private val list: MutableList<Expr> = mutableLi
   }
 }
 
-inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
+@JvmInline
+value class Conditional(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -57,7 +60,8 @@ inline class Conditional(private val list: MutableList<Expr> = mutableListOf()) 
 }
 
 
-inline class Definition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
+@JvmInline
+value class Definition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun plusAssign(item: Expr) {
     list += item
   }
@@ -71,16 +75,20 @@ inline class Definition(private val list: MutableList<Expr> = mutableListOf()) :
 }
 
 interface Atom : Expr
-inline class Symbol(val name: String) : Atom {
+
+@JvmInline
+value class Symbol(val name: String) : Atom {
   override fun evaluate(env: Env): Any = env[name] ?: error("cannot find Symbol[${name}]")
   override fun toString(): String = name
 }
 
 interface NumberAtom : Atom
-inline class IntNumber(val value: Int) : NumberAtom {
+@JvmInline
+value class IntNumber(val value: Int) : NumberAtom {
   override fun evaluate(env: Env): Any = value
 }
 
-inline class FloatNumber(val value: Float) : NumberAtom {
+@JvmInline
+value class FloatNumber(val value: Float) : NumberAtom {
   override fun evaluate(env: Env): Any = value
 }

@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   application
-  kotlin("jvm") version "1.4.32"
+  kotlin("jvm") version "1.5.0-RC"
   id("com.palantir.graal") version "0.7.2"
   id("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -17,7 +17,6 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
-    useIR = true
     freeCompilerArgs = listOf("-Xinline-classes")
   }
 }
