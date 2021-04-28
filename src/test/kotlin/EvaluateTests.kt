@@ -43,7 +43,7 @@ class EvaluateTests : StringSpec({
     ).evaluate(env) shouldBe 390
   }
 
-  "function definition" {
+  "function definition syntactic sugar" {
     buildAst(
       """
         (define (square x) (* x x))
