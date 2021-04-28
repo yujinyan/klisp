@@ -49,7 +49,7 @@ class EvaluateTests : StringSpec({
         (define (square x) (* x x))
       """
     ).evaluate(env)
-    buildAst("(square 10)") shouldBe 100
+    buildAst("(square 10)").evaluate(env) shouldBe 100
   }
 
   "multiple expr" {
