@@ -19,6 +19,11 @@ value class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListE
   }
 }
 
+/**
+ * ```
+ * (define square (lambda (x) (* x x)))
+ * ```
+ */
 @JvmInline
 value class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
   override fun evaluate(env: Env): Any {
@@ -67,6 +72,21 @@ value class Definition(private val list: MutableList<Expr> = mutableListOf()) : 
   }
 
   override fun evaluate(env: Env): Any {
+    val firstItem = list[1]
+
+    // (define (square x) (* x x))
+    //         ^^^^^^^^^^
+    if (firstItem is ProcedureCall) {
+      val symbol = firstItem.list[0] as Symbol
+      val expr = ProcedureDefinition().apply {
+        this += Symbol("lambda")
+        this += ProcedureCall(firstItem.list.drop(1).toMutableList())
+        this += list[2]
+      }
+      env[symbol.name] = expr.evaluate(env)
+      return expr
+    }
+
     val symbol = list[1] as Symbol
     val result = list[2].evaluate(env)
     env[symbol.name] = result
@@ -83,6 +103,7 @@ value class Symbol(val name: String) : Atom {
 }
 
 interface NumberAtom : Atom
+
 @JvmInline
 value class IntNumber(val value: Int) : NumberAtom {
   override fun evaluate(env: Env): Any = value

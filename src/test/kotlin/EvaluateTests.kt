@@ -29,7 +29,7 @@ class EvaluateTests : StringSpec({
   }
 
   "complicated arithmetic" {
-    arrayListOf(1, 2,3 )
+    arrayListOf(1, 2, 3)
     buildAst("(+ (* 3 (+ (* 2 4) (+ 3 5))) (+ (- 10 7) 6 ))")
       .evaluate(env) shouldBe 57
   }
@@ -41,6 +41,15 @@ class EvaluateTests : StringSpec({
          (+ 3 5 7))
     """.trimIndent()
     ).evaluate(env) shouldBe 390
+  }
+
+  "function definition syntactic sugar" {
+    buildAst(
+      """
+        (define (square x) (* x x))
+      """
+    ).evaluate(env)
+    buildAst("(square 10)").evaluate(env) shouldBe 100
   }
 
   "multiple expr" {
