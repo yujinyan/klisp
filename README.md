@@ -14,6 +14,7 @@ Syntax
 - lambda definition `(lambda (symbol...) exp)`
 - procedure call `(proc arg...)`
 - conditional `(if test conseq alt)`
+- function definition shorthand `(define (symbol param...) exp)`
 
 Types
 - int
