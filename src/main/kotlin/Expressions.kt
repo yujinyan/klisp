@@ -2,19 +2,23 @@ interface Expr {
   fun evaluate(env: Env): Any
 }
 
-interface ListExpr : Expr {
-  operator fun plusAssign(item: Expr)
-}
-
-@JvmInline
-value class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListExpr {
-  override fun plusAssign(item: Expr) {
+sealed class ListExpr(
+  protected val list: MutableList<Expr> = mutableListOf()
+) : Expr, MutableList<Expr> by list {
+  operator fun plusAssign(item: Expr) {
     list += item
   }
 
+  override fun toString(): String {
+    return "(" + list.joinToString(" ") + ")"
+  }
+}
+
+
+class ProcedureCall(list: MutableList<Expr> = mutableListOf()) : ListExpr(list) {
   override fun evaluate(env: Env): Any {
     val symbol = list[0] as Symbol
-    val op = env[symbol.name] as Procedure
+    val op = (env[symbol.name] ?: error("Cannot find Symbol($symbol)")) as Procedure
     return op(list.subList(1, list.size).map { it.evaluate(env) })
   }
 }
@@ -24,11 +28,10 @@ value class ProcedureCall(val list: MutableList<Expr> = mutableListOf()) : ListE
  * (define square (lambda (x) (* x x)))
  * ```
  */
-@JvmInline
-value class ProcedureDefinition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
+class ProcedureDefinition() : ListExpr() {
   override fun evaluate(env: Env): Any {
-    val params = (list[1] as? ProcedureCall)?.list ?: error("${list[1]} is not a ProcedureCall")
-    val body = list[2]
+    val params = (list[1] as? ProcedureCall) ?: error("${list[1]} is not a ProcedureCall")
+    val body: List<Expr> = list.subList(2, list.size)
 
     return object : Procedure {
       override fun invoke(args: List<Any>): Any {
@@ -38,24 +41,17 @@ value class ProcedureDefinition(private val list: MutableList<Expr> = mutableLis
           env[(expr as Symbol).name] = args[index]
         }
 
-        val result = body.evaluate(env)
+        val result = body.asSequence()
+          .map { it.evaluate(env) }
+          .last()
         env.pop()
         return result
       }
     }
   }
-
-  override fun plusAssign(item: Expr) {
-    list += item
-  }
 }
 
-@JvmInline
-value class Conditional(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
-  override fun plusAssign(item: Expr) {
-    list += item
-  }
-
+class Conditional : ListExpr() {
   override fun evaluate(env: Env): Any {
     val test = list[1].evaluate(env) as? Boolean ?: error("Cannot evaluate")
     return if (test)
@@ -65,11 +61,7 @@ value class Conditional(private val list: MutableList<Expr> = mutableListOf()) :
 }
 
 
-@JvmInline
-value class Definition(private val list: MutableList<Expr> = mutableListOf()) : ListExpr {
-  override fun plusAssign(item: Expr) {
-    list += item
-  }
+class Definition : ListExpr() {
 
   override fun evaluate(env: Env): Any {
     val firstItem = list[1]
@@ -77,11 +69,11 @@ value class Definition(private val list: MutableList<Expr> = mutableListOf()) : 
     // (define (square x) (* x x))
     //         ^^^^^^^^^^
     if (firstItem is ProcedureCall) {
-      val symbol = firstItem.list[0] as Symbol
+      val symbol = firstItem[0] as Symbol
       val expr = ProcedureDefinition().apply {
         this += Symbol("lambda")
-        this += ProcedureCall(firstItem.list.drop(1).toMutableList())
-        this += list[2]
+        this += ProcedureCall(firstItem.drop(1).toMutableList())
+        this += list.subList(2, list.size)
       }
       env[symbol.name] = expr.evaluate(env)
       return expr
