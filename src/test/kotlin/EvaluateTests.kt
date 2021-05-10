@@ -1,5 +1,7 @@
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.floats.plusOrMinus
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 
 val env = DefaultEnv()
 
@@ -50,6 +52,33 @@ class EvaluateTests : StringSpec({
       """
     ).evaluate(env)
     buildAst("(square 10)").evaluate(env) shouldBe 100
+  }
+
+  "block structure" {
+    buildAstList(
+      """
+  (define (sqrt x)
+    (define (abs x)
+      (if (< x 0) (* -1 x) x))
+    (define (average x y)
+      (/ (+ x y) 2))
+    (define (square x)
+      (* x x))
+    (define (good-enough? guess)
+      (< (abs (- (square guess) x)) 0.001))
+    (define (improve guess)
+      (average guess (/ x guess)))
+    (define (sqrt-iter guess)
+      (if (good-enough? guess)
+          guess
+          (sqrt-iter (improve guess))))
+    (sqrt-iter 1.0))
+  (sqrt 25)
+    """
+    ).map { it.evaluate(env) }
+      .last()
+      .shouldBeTypeOf<Float>()
+      .shouldBe(5f plusOrMinus 0.001f)
   }
 
   "multiple expr" {
