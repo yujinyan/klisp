@@ -86,6 +86,10 @@ class EvaluateTests : StringSpec({
     buildAst("(+ x 1)").evaluate(env) shouldBe 2
   }
 
+  "anonymous lambda" {
+    buildAst("((lambda (x) (* x x)) 5)").evaluate(env) shouldBe 25
+  }
+
   "wrong 1 + 1" {
 
   }

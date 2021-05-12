@@ -17,8 +17,11 @@ sealed class ListExpr(
 
 class ProcedureCall(list: MutableList<Expr> = mutableListOf()) : ListExpr(list) {
   override fun evaluate(env: Env): Any {
-    val symbol = list[0] as Symbol
-    val op = (env[symbol.name] ?: error("Cannot find Symbol($symbol)")) as Procedure
+    val op = when (val it = list[0]) {
+      is Symbol -> (env[it.name] ?: error("Cannot find Symbol($it)"))
+      is ProcedureDefinition -> it.evaluate(env)
+      else -> error("$it is not a ProcedureDefinition")
+    } as Procedure
     return op(list.subList(1, list.size).map { it.evaluate(env) })
   }
 }
